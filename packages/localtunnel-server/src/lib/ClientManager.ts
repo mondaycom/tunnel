@@ -43,7 +43,7 @@ class ClientManager {
     const maxSockets = this.opt.maxTcpSockets;
     const agent = new TunnelAgent({
       clientId: id,
-      maxSockets: 10,
+      maxSockets,
       logger: this.logger,
     });
 

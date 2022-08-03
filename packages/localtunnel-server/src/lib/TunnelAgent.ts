@@ -175,7 +175,6 @@ class TunnelAgent extends Agent {
     options: ClientRequestArgs,
     cb: CreateConnectionCallback
   ) => {
-    console.log(cb == null);
     if (this.closed) {
       cb(new Error('closed'), null);
       return;
@@ -196,7 +195,6 @@ class TunnelAgent extends Agent {
     }
 
     this.logger?.debug('socket given');
-    console.log(cb == null);
     cb(null, sock);
   };
 

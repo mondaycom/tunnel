@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import 'localenv';
 import yargs from 'yargs';
 import pino from 'pino';
 import { AddressInfo } from 'net';
@@ -30,7 +29,7 @@ const { argv } = yargs(process.argv.slice(2))
     type: 'string',
   })
   .options('max-sockets', {
-    default: 1,
+    default: 2,
     describe:
       'maximum number of tcp sockets each client is allowed to establish at one time (the tunnels)',
     type: 'number',
