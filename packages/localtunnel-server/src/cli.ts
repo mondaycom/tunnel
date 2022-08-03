@@ -30,7 +30,7 @@ const { argv } = yargs(process.argv.slice(2))
     type: 'string',
   })
   .options('max-sockets', {
-    default: 10,
+    default: 1,
     describe:
       'maximum number of tcp sockets each client is allowed to establish at one time (the tunnels)',
     type: 'number',

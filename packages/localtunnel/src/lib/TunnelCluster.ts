@@ -1,13 +1,12 @@
-import fs from 'node:fs';
 import net from 'node:net';
-import tls from 'node:tls';
 import { Readable } from 'node:stream';
 import { hasCode } from '@mondaydotcomorg/localtunnel-common';
 
 import { HeaderHostTransformer } from './HeaderHostTransformer';
-import { TunnelInfo } from './Tunnel';
+import { TunnelInfo } from './TunnelConnection';
 import { Subject } from 'rxjs';
 import { Logger } from 'pino';
+import { randomUUID } from 'node:crypto';
 
 export interface TunnelRequestInfo {
   method: string;
@@ -18,11 +17,10 @@ export interface TunnelClusterOptions extends TunnelInfo {
   logger?: Logger;
 }
 
-// manages groups of tunnels
 export class TunnelCluster {
-  $open = new Subject<net.Socket>();
+  $open = new Subject<{ tunnelId: string; socket: net.Socket }>();
   $error = new Subject<Error>();
-  $dead = new Subject<void>();
+  $dead = new Subject<{ tunnelId: string }>();
   $request = new Subject<TunnelRequestInfo>();
   logger?: Logger;
 
@@ -32,16 +30,16 @@ export class TunnelCluster {
   get localHost() {
     return this.opts.localHost || 'localhost';
   }
-  get localProtocol() {
-    return this.opts.localHttps ? 'https' : 'http';
-  }
+  readonly localProtocol = 'http';
 
   constructor(readonly opts: TunnelClusterOptions) {
     this.logger = this.opts.logger;
   }
 
-  open() {
-    this.logger?.debug(
+  async open() {
+    const tunnelId = TunnelCluster.getRandomTunnelId();
+    const logger = this.logger?.child({ tunnelId });
+    logger?.debug(
       'establishing tunnel %s://%s:%s <> %s:%s',
       this.localProtocol,
       this.localHost,
@@ -59,7 +57,7 @@ export class TunnelCluster {
     remote.setKeepAlive(true);
 
     remote.on('error', (err) => {
-      this.logger?.debug('got remote connection error %s', err.message);
+      logger?.error('got remote connection error %s', err.message);
       remote.end();
 
       // emit connection refused errors immediately, because they
@@ -67,7 +65,7 @@ export class TunnelCluster {
       if (hasCode(err) && err.code === 'ECONNREFUSED') {
         this.$error.next(
           new Error(
-            `connection refused: ${this.remoteHostOrIp}:${this.opts.remotePort} (check your firewall settings)`
+            `${tunnelId} connection refused: ${this.remoteHostOrIp}:${this.opts.remotePort} (check your firewall settings)`
           )
         );
       }
@@ -83,20 +81,24 @@ export class TunnelCluster {
     });
 
     // tunnel is considered open when remote connects
-    remote.once('connect', () => {
-      this.$open.next(remote);
-      this.connLocal(remote);
+    return new Promise((resolve) => {
+      remote.once('connect', () => {
+        this.$open.next({ socket: remote, tunnelId });
+        resolve(remote);
+        this.connLocal(remote, tunnelId);
+      });
     });
   }
 
-  private connLocal = (remote: net.Socket) => {
+  private connLocal = (remote: net.Socket, tunnelId: string) => {
+    const logger = this.logger?.child({ tunnelId });
     if (remote.destroyed) {
-      this.logger?.debug('remote destroyed');
-      this.$dead.next();
+      logger?.debug('remote destroyed');
+      this.$dead.next({ tunnelId });
       return;
     }
 
-    this.logger?.debug(
+    logger?.debug(
       'connecting locally to %s://%s:%d',
       this.localProtocol,
       this.localHost,
@@ -104,22 +106,12 @@ export class TunnelCluster {
     );
     remote.pause();
 
-    if (this.opts.allowInvalidCert) {
-      this.logger?.debug('allowing invalid certificates');
-    }
-
     // connection to local http server
-    const local = this.opts.localHttps
-      ? tls.connect({
-          host: this.localHost,
-          port: this.opts.localPort,
-          ...this.getLocalCertOpts(),
-        })
-      : net.connect(this.opts.localPort, this.localHost);
+    const local = net.connect(this.opts.localPort, this.localHost);
 
     const remoteClose = () => {
-      this.logger?.debug('remote close');
-      this.$dead.next();
+      logger?.debug('remote close');
+      this.$dead.next({ tunnelId });
       local.end();
     };
 
@@ -129,22 +121,21 @@ export class TunnelCluster {
     // multiple local connections impossible. We need a smarter way to scale
     // and adjust for such instances to avoid beating on the door of the server
     local.once('error', (err) => {
-      this.logger?.debug('local error %s', err.message);
+      logger?.debug('local error %s', err.message);
       local.end();
 
       remote.removeListener('close', remoteClose);
 
-      if (err.code !== 'ECONNREFUSED') {
+      if (!hasCode(err) || err.code !== 'ECONNREFUSED') {
         remote.end();
         return;
       }
-
       // retrying connection to local server
-      setTimeout(this.connLocal, 1000);
+      setTimeout(() => this.connLocal(remote, tunnelId), 1000);
     });
 
     local.once('connect', () => {
-      this.logger?.debug('connected locally');
+      logger?.debug('connected locally');
       remote.resume();
 
       let stream: Readable = remote;
@@ -152,7 +143,7 @@ export class TunnelCluster {
       // if user requested specific local host
       // then we use host header transform to replace the host header
       if (this.opts.localHost) {
-        this.logger?.debug('transform Host header to %s', this.opts.localHost);
+        logger?.debug('transform Host header to %s', this.opts.localHost);
         stream = remote.pipe(
           new HeaderHostTransformer({ host: this.opts.localHost })
         );
@@ -162,28 +153,12 @@ export class TunnelCluster {
 
       // when local closes, also get a new remote
       local.once('close', (hadError) => {
-        this.logger?.debug('local connection closed [%s]', hadError);
+        logger?.debug('local connection closed [%s]', hadError);
       });
     });
   };
 
-  private getLocalCertOpts = () => {
-    if (this.opts.allowInvalidCert) {
-      return { rejectUnauthorized: false };
-    }
-
-    if (!this.opts.localCert) {
-      throw new Error('local-cert is required');
-    }
-
-    if (!this.opts.localKey) {
-      throw new Error('local-key is required');
-    }
-
-    return {
-      cert: fs.readFileSync(this.opts.localCert),
-      key: fs.readFileSync(this.opts.localKey),
-      ca: this.opts.localCa ? [fs.readFileSync(this.opts.localCa)] : undefined,
-    };
-  };
+  private static getRandomTunnelId() {
+    return randomUUID().substring(0, 6);
+  }
 }

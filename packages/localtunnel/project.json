@@ -20,7 +20,8 @@
         "args": [
           "--port=8091",
           "--host=http://localhost:8089",
-          "--debug"
+          "--debug",
+          "--print-requests"
         ],
         "inspect": false
       }

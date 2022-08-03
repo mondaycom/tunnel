@@ -5,6 +5,7 @@ import yargs from 'yargs';
 import localtunnel from './lib/localtunnel';
 import { version } from '../package.json';
 import pino from 'pino';
+import pretty from 'pino-pretty';
 
 const { argv } = yargs
   .usage('Usage: lt --port [num] <options>')
@@ -31,31 +32,6 @@ const { argv } = yargs
       'Tunnel traffic to this host instead of localhost, override Host header to this host',
     type: 'string',
   })
-  .option('local-https', {
-    describe: 'Tunnel traffic to a local HTTPS server',
-    type: 'boolean',
-  })
-  .option('local-cert', {
-    describe: 'Path to certificate PEM file for local HTTPS server',
-    type: 'string',
-    implies: 'local-https',
-  })
-  .option('local-key', {
-    describe: 'Path to certificate key file for local HTTPS server',
-    type: 'string',
-    implies: 'local-https',
-  })
-  .option('local-ca', {
-    describe: 'Path to certificate authority file for self-signed certificates',
-    type: 'string',
-    implies: 'local-https',
-  })
-  .option('allow-invalid-cert', {
-    describe:
-      'Disable certificate checks for your local HTTPS server (ignore cert/key/ca options)',
-    type: 'boolean',
-    implies: 'local-https',
-  })
   .options('open', {
     alias: 'o',
     describe: 'Opens the tunnel URL in your browser',
@@ -73,12 +49,16 @@ const { argv } = yargs
   .help('help', 'Show this help and exit')
   .version(version);
 
-export const logger = pino({
-  transport: {
-    target: 'pino-pretty',
+export const logger = pino(
+  {
+    level: argv.debug ? 'debug' : 'info',
   },
-  level: argv.debug ? 'debug' : 'info',
-});
+  pretty({
+    ignore: 'pid,hostname',
+    singleLine: true,
+    translateTime: 'SYS:HH:MM:ss.l',
+  })
+);
 
 (async () => {
   const tunnel = await localtunnel({
@@ -86,25 +66,21 @@ export const logger = pino({
     host: argv.host,
     subdomain: argv.subdomain,
     localHost: argv['local-host'],
-    localHttps: argv['local-https'],
-    localCert: argv['local-cert'],
-    localKey: argv['local-key'],
-    localCa: argv['local-ca'],
-    allowInvalidCert: argv['allow-invalid-cert'],
     logger,
   }).catch((err: Error) => {
-    throw err;
+    logger.error({ err });
+    process.exit(1);
   });
 
   tunnel.$error.subscribe((err) => {
-    throw err;
+    logger.error({ err });
   });
 
   logger.info('your url is: %s', tunnel.info?.url);
 
   if (argv['print-requests']) {
     tunnel.$request.subscribe((info) => {
-      logger.info(new Date().toString(), info.method, info.path);
+      logger.info(`${info.method} - ${info.path}`);
     });
   }
 })();

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { TunnelRequestInfo, TunnelCluster } from './TunnelCluster';
 import { NewClientResponse } from '@mondaydotcomorg/localtunnel-common';
-import { filter, first, retry, skipWhile } from 'rxjs/operators';
+import { filter, first, mergeMap, retry, skipWhile } from 'rxjs/operators';
 import { BehaviorSubject, lastValueFrom, from, range, Subject } from 'rxjs';
 import { Logger } from 'pino';
 
@@ -13,11 +13,6 @@ export interface TunnelOptions {
   localHost?: string;
   port: number;
   localPort?: number;
-  localHttps?: boolean;
-  localCert?: string;
-  localCa?: string;
-  localKey?: string;
-  allowInvalidCert?: boolean;
   maxConnCount?: number;
   logger?: Logger;
 }
@@ -31,14 +26,9 @@ export interface TunnelInfo {
   remotePort: number;
   localHost?: string;
   localPort: number;
-  localHttps?: boolean;
-  localCert?: string;
-  localCa?: string;
-  localKey?: string;
-  allowInvalidCert?: boolean;
 }
 
-export class Tunnel {
+export class TunnelConnection {
   tunnelCluster?: TunnelCluster;
   info?: TunnelInfo;
 
@@ -72,31 +62,17 @@ export class Tunnel {
 
   private getInfo(body: NewClientResponse): TunnelInfo {
     const { id, ip, port, url, maxConnCount } = body;
-    const {
-      host,
-      port: localPort,
-      localHost,
-      localHttps,
-      localCert,
-      localKey,
-      localCa,
-      allowInvalidCert,
-    } = this.opts;
+    const { host, port: localPort, localHost } = this.opts;
 
     return {
       clientId: id,
       url,
       maxConnCount: maxConnCount || 1,
-      remoteHost: parse(host).hostname ?? undefined,
+      remoteHost: new URL(host).hostname ?? undefined,
       remoteIp: ip,
       remotePort: port,
       localPort,
       localHost,
-      localHttps,
-      localCert,
-      localKey,
-      localCa,
-      allowInvalidCert,
     };
   }
 
@@ -129,10 +105,13 @@ export class Tunnel {
   }
 
   private async establish(info: TunnelInfo) {
-    this.tunnelCluster = new TunnelCluster(info);
+    const tunnelCluster = (this.tunnelCluster = new TunnelCluster({
+      ...info,
+      logger: this.logger,
+    }));
 
     // re-emit socket error
-    this.tunnelCluster.$error.subscribe((err) => {
+    tunnelCluster.$error.subscribe((err) => {
       this.logger?.debug('got socket error: %s', err.message);
       this.$error.next(err);
     });
@@ -140,26 +119,26 @@ export class Tunnel {
     let tunnelCount = 0;
 
     // track open count
-    this.tunnelCluster.$open.subscribe((tunnel) => {
+    tunnelCluster.$open.subscribe(({ socket, tunnelId }) => {
       tunnelCount++;
-      this.logger?.debug('tunnel open [total: %d]', tunnelCount);
+      this.logger?.debug({ tunnelId }, 'tunnel open [total: %d]', tunnelCount);
 
       const closeSub = this.$close
         .pipe(
           skipWhile((x) => !x),
           first()
         )
-        .subscribe(() => tunnel.destroy());
+        .subscribe(() => socket.destroy());
 
-      tunnel.once('close', () => {
+      socket.once('close', () => {
         closeSub.unsubscribe();
       });
     });
 
     // when a tunnel dies, open a new one
-    this.tunnelCluster.$dead.subscribe(() => {
+    tunnelCluster.$dead.subscribe(({ tunnelId }) => {
       tunnelCount--;
-      this.logger?.debug('tunnel dead [total: %d]', tunnelCount);
+      this.logger?.debug({ tunnelId }, 'tunnel dead [total: %d]', tunnelCount);
       this.$close
         .pipe(
           first(),
@@ -170,15 +149,14 @@ export class Tunnel {
         });
     });
 
-    this.tunnelCluster.$request.subscribe((req) => {
+    tunnelCluster.$request.subscribe((req) => {
       this.$request.next(req);
     });
 
-    range(0, info.maxConnCount).subscribe(() => {
-      this.tunnelCluster?.open();
-    });
-
-    // only emit the url the first time
-    await lastValueFrom(this.tunnelCluster.$open);
+    await lastValueFrom(
+      range(0, info.maxConnCount).pipe(
+        mergeMap(() => from(tunnelCluster.open()))
+      )
+    );
   }
 }
