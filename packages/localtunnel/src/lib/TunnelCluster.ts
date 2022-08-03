@@ -153,7 +153,7 @@ export class TunnelCluster {
 
       // when local closes, also get a new remote
       local.once('close', (hadError) => {
-        logger?.debug('local connection closed [%s]', hadError);
+        logger?.debug('local connection closed [error: %s]', hadError);
       });
     });
   };
