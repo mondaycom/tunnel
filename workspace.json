@@ -1,5 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/workspace-schema.json",
   "version": 2,
-  "projects": {}
+  "projects": {
+    "demo-app": "packages/demo-app",
+    "localtunnel": "packages/localtunnel",
+    "localtunnel-common": "packages/localtunnel-common",
+    "localtunnel-server": "packages/localtunnel-server"
+  }
 }

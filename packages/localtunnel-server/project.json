@@ -1,0 +1,52 @@
+{
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/localtunnel-server/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/packages/localtunnel-server",
+        "main": "packages/localtunnel-server/src/cli.ts",
+        "tsConfig": "packages/localtunnel-server/tsconfig.lib.json",
+        "assets": ["packages/localtunnel-server/*.md"]
+      }
+    },
+    "start": {
+      "executor": "@nrwl/node:node",
+      "options": {
+        "buildTarget": "localtunnel-server:build",
+        "args": ["--port=8089", "--debug", "--domain=localhost"]
+      }
+    },
+    "publish": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "command": "node tools/scripts/publish.mjs localtunnel-server {args.ver} {args.tag}"
+      },
+      "dependsOn": [
+        {
+          "projects": "self",
+          "target": "build"
+        }
+      ]
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["packages/localtunnel-server/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/packages/localtunnel-server"],
+      "options": {
+        "jestConfig": "packages/localtunnel-server/jest.config.ts",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

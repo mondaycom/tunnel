@@ -13,8 +13,19 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@mondaydotcomorg/localtunnel": ["packages/localtunnel/src/index.ts"],
+      "@mondaydotcomorg/localtunnel-common": [
+        "packages/localtunnel-common/src/index.ts"
+      ],
+      "@mondaydotcomorg/localtunnel-server": [
+        "packages/localtunnel-server/src/index.ts"
+      ]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }
