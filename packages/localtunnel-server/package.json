@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "@alexjamesmalcolm/human-readable-ids": "^1.0.12",
-    "@mondaydotcomorg/localtunnel-common": "^0.0.1",
+    "@mondaydotcomorg/localtunnel-common": "*",
     "esm": "3.2.25",
     "human-readable-ids": "1.0.3",
     "koa": "2.13.4",
