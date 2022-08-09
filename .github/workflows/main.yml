@@ -26,6 +26,7 @@ jobs:
           git config user.email "gituser@monday.com"
       - uses: nrwl/nx-set-shas@v2
       - run: npm ci
+      - run: npx nx run-many --configuration=production --target=build --parallel=3
       - run: npm config --global set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
       - name: Version
         shell: bash
