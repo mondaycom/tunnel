@@ -63,8 +63,8 @@
           "load": false,
           "push": true,
           "tags": [
-            "us-east1-docker.pkg.dev/monday-localtunnel/localtunnel:latest",
-            "us-east1-docker.pkg.dev/monday-localtunnel/localtunnel:${version}"
+            "us-east1-docker.pkg.dev/monday-localtunnel/localtunnel/localtunnel-server:latest",
+            "us-east1-docker.pkg.dev/monday-localtunnel/localtunnel/localtunnel-server:${version}"
           ]
         }
       }
