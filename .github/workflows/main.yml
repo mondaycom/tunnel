@@ -1,8 +1,6 @@
-name: Build
+name: Release
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   release:
@@ -28,10 +26,9 @@ jobs:
           git config user.email "gituser@monday.com"
       - uses: nrwl/nx-set-shas@v2
       - run: npm ci
-      - run: npx nx affected --configuration=production --target=build
       - name: Version
         shell: bash
-        run: npx nx affected --base=last-release --target=version
+        run: npx nx affected --parallel=1 --base=last-release --target=version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
