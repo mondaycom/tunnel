@@ -50,7 +50,7 @@
     "push-tag": {
       "executor": "nx:run-commands",
       "options": {
-        "commands": ["git push origin ${tag}"]
+        "command": "git push origin ${tag}"
       }
     },
     "github": {
