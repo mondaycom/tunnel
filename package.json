@@ -7,7 +7,6 @@
     "build:all": "nx run-many --target=build --all",
     "test:affected": "nx affected --target=test",
     "test:all": "nx run-many --target=test --all",
-    "postinstall": "npm run build:all",
     "prepare": "husky install"
   },
   "private": true,
