@@ -20,6 +20,20 @@
         "args": ["--port=8089", "--debug", "--domain=localhost"]
       }
     },
+    "docker": {
+      "executor": "@nx-tools/nx-docker:build",
+      "options": {
+        "load": true,
+        "tags": ["monday/localtunnel-server:latest"]
+      },
+      "dependsOn": ["build"],
+      "configurations": {
+        "production": {
+          "load": false,
+          "push": true
+        }
+      }
+    },
     "publish": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {

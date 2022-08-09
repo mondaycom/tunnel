@@ -1,0 +1,25 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  login:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: docker/login-action@v2
+        with:
+          registry: us-east1-docker.pkg.dev
+          username: _json_key
+          password: ${{ secrets.GAR_JSON_KEY }}
+  build:
+    name: Docker build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: nrwl/nx-set-shas@v2
+      - uses: docker/setup-qemu-action@v1
+      - uses: docker/setup-buildx-action@v1
+      - run: npm ci
+      - run: npx nx affected --configuration=production --target=docker

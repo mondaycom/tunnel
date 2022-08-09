@@ -25,6 +25,7 @@
     "@nrwl/linter": "14.5.1",
     "@nrwl/node": "^14.5.1",
     "@nrwl/workspace": "14.5.1",
+    "@nx-tools/nx-docker": "^3.0.2",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
