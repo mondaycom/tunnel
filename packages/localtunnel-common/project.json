@@ -32,23 +32,13 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "conventional",
-        "postTargets": [
-          "localtunnel-common:push-tag",
-          "localtunnel-common:publish"
-        ]
+        "postTargets": ["localtunnel-common:publish"]
       }
     },
     "publish": {
       "executor": "ngx-deploy-npm:deploy",
       "options": {
         "access": "public"
-      }
-    },
-    "push-tag": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "git push origin ${tag}",
-        "forwardAllArgs": false
       }
     }
   },
