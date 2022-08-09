@@ -32,7 +32,10 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "conventional",
-        "postTargets": ["localtunnel-common:push-tag", "localtunnel-common:publish"]
+        "postTargets": [
+          "localtunnel-common:push-tag",
+          "localtunnel-common:publish"
+        ]
       }
     },
     "publish": {
@@ -46,7 +49,7 @@
       "options": {
         "commands": ["git push origin ${tag}"]
       }
-    },
+    }
   },
   "tags": []
 }
