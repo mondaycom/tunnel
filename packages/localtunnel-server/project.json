@@ -39,7 +39,7 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "conventional",
-        "postTargets": ["publish", "github", "docker:production"]
+        "postTargets": ["localtunnel-server:publish", "localtunnel-server:github", "localtunnel-server:docker:production"]
       }
     },
     "github": {
