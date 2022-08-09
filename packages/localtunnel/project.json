@@ -45,7 +45,17 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "conventional",
-        "postTargets": ["localtunnel:publish", "localtunnel:github"]
+        "postTargets": [
+          "localtunnel:publish",
+          "localtunnel:push-tag",
+          "localtunnel:github"
+        ]
+      }
+    },
+    "push-tag": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": ["git push origin ${tag}"]
       }
     },
     "github": {
