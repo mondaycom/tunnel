@@ -26,12 +26,12 @@ jobs:
           git config user.email "gituser@monday.com"
       - uses: nrwl/nx-set-shas@v2
       - run: npm ci
+      - run: echo //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }} > ~/.npmrc
       - name: Version
         shell: bash
         run: npx nx affected --parallel=1 --base=last-release --target=version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Tag last-release
         shell: bash
         run: |
