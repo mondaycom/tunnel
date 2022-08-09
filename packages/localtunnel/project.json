@@ -46,8 +46,8 @@
       "options": {
         "preset": "conventional",
         "postTargets": [
-          "localtunnel:publish",
           "localtunnel:push-tag",
+          "localtunnel:publish",
           "localtunnel:github"
         ]
       }

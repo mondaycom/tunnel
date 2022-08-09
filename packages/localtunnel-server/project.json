@@ -40,8 +40,8 @@
       "options": {
         "preset": "conventional",
         "postTargets": [
-          "localtunnel-server:publish",
           "localtunnel-server:push-tag",
+          "localtunnel-server:publish",
           "localtunnel-server:github",
           "localtunnel-server:docker:production"
         ]
