@@ -1,6 +1,6 @@
 {
   "name": "@mondaydotcomorg/localtunnel-server",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "type": "commonjs",
   "bin": {
     "lt-server": "src/cli.js"
