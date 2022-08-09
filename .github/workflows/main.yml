@@ -29,7 +29,7 @@ jobs:
       - run: npm config --global set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
       - name: Version
         shell: bash
-        run: npx nx affected --parallel=1 --base=last-release --target=version
+        run: npx nx run-many --parallel=1 --base=last-release --target=version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag last-release
