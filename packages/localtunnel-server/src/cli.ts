@@ -8,6 +8,7 @@ import createServer from './lib/server';
 
 const { argv } = yargs(process.argv.slice(2))
   .usage('Usage: $0 --port [num]')
+  .env('LOCALTUNNEL_SERVER')
   .options('secure', {
     default: false,
     describe: 'use this flag to indicate proxy over https',
