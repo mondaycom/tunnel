@@ -17,15 +17,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18'
-      - name: Setup Git
-        run: |
-          git config user.name "GitHub Bot"
-          git config user.email "gituser@monday.com"
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
+      - name: Setup Git
+        run: |
+          git config user.name "GitHub Bot"
+          git config user.email "gituser@monday.com"
       - uses: nrwl/nx-set-shas@v2
       - run: npm ci
       - run: npx nx affected --configuration=production --target=build
