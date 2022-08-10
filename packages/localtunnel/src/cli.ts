@@ -19,7 +19,7 @@ const { argv } = yargs
   .option('host', {
     alias: 'h',
     describe: 'Upstream server providing forwarding',
-    default: 'https://tunnel.monday.com',
+    default: 'https://tunnel.monday.app',
   })
   .option('subdomain', {
     alias: 's',
