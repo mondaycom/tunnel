@@ -22,8 +22,16 @@
           "--host=http://localhost:8089",
           "--debug",
           "--print-requests"
-        ],
-        "inspect": false
+        ]
+      },
+      "configurations": {
+        "production": {
+          "args": [
+            "--host=http://tunnel.monday.app",
+            "--debug",
+            "--print-requests"
+          ]
+        }
       }
     },
     "lint": {
