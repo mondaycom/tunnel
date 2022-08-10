@@ -41,9 +41,17 @@
         "preset": "conventional",
         "push": true,
         "postTargets": [
+          "localtunnel-server:github",
           "localtunnel-server:publish",
           "localtunnel-server:docker:production"
         ]
+      }
+    },
+    "github": {
+      "executor": "@jscutlery/semver:github",
+      "options": {
+        "tag": "${tag}",
+        "notes": "${notes}"
       }
     },
     "publish": {
