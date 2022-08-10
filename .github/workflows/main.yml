@@ -43,6 +43,7 @@ jobs:
   deploy-server:
     runs-on: ubuntu-latest
     environment: gcp
+    needs: release
     steps:
       - uses: 'google-github-actions/auth@v0'
         with:
@@ -50,4 +51,5 @@ jobs:
       - name: Set up Cloud SDK
         uses: 'google-github-actions/setup-gcloud@v0'
       - name: Deploy Docker image
+        working-directory: ./packages/localtunnel-server
         run: gcloud app deploy --image-url us-east1-docker.pkg.dev/monday-localtunnel/localtunnel/localtunnel-server:latest
