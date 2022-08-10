@@ -85,7 +85,10 @@ export default function (opt: ServerOptions) {
     logger?.debug('existing conn req: %o', ctx.request);
 
     // no new client request, send to landing page
-    ctx.redirect(landingPage);
+    // TODO: implement a landing page
+    // ctx.redirect(landingPage);
+    ctx.status = 404;
+    return;
   });
 
   // anything after the / path is a request for a specific client name
