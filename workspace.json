@@ -3,6 +3,7 @@
   "version": 2,
   "projects": {
     "demo-app": "packages/demo-app",
+    "docs": "packages/docs",
     "tunnel": "packages/tunnel",
     "tunnel-common": "packages/tunnel-common",
     "tunnel-server": "packages/tunnel-server"
