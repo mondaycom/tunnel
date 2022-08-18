@@ -1,6 +1,6 @@
 import Koa from 'koa';
 import tldjs from 'tldjs';
-import http from 'http';
+import http, { IncomingHttpHeaders } from 'http';
 import { humanReadableId } from '@alexjamesmalcolm/human-readable-ids';
 import Router from 'koa-router';
 import { Logger } from 'pino';
@@ -15,6 +15,11 @@ export type ServerOptions = {
   maxTcpSockets?: number;
   logger?: Logger;
 };
+
+const getHostname = (ctx: {
+  headers: IncomingHttpHeaders;
+}): string | undefined =>
+  (ctx.headers['X-Forwarded-Host'] as string | undefined) ?? ctx.headers.host;
 
 export default function (opt: ServerOptions) {
   opt = opt || {};
@@ -58,7 +63,7 @@ export default function (opt: ServerOptions) {
   });
 
   router.post('/api/tunnels', async (ctx) => {
-    const hostname = ctx.headers.host;
+    const hostname = getHostname(ctx);
     if (!hostname) {
       ctx.throw(400, 'Host header is required');
       return;
@@ -74,7 +79,8 @@ export default function (opt: ServerOptions) {
   });
 
   router.post('/api/tunnels/:id', async (ctx) => {
-    const hostname = ctx.headers.host;
+    ctx.headers;
+    const hostname = getHostname(ctx);
     if (!hostname) {
       ctx.throw(400, 'Host header is required');
       return;
@@ -111,7 +117,7 @@ export default function (opt: ServerOptions) {
 
   server.on('request', (req, res) => {
     // without a hostname, we won't know who the request is for
-    const hostname = req.headers.host;
+    const hostname = getHostname(req);
     if (!hostname) {
       res.statusCode = 400;
       res.end('Host header is required');
@@ -135,7 +141,7 @@ export default function (opt: ServerOptions) {
   });
 
   server.on('upgrade', (req, socket, head) => {
-    const hostname = req.headers.host;
+    const hostname = getHostname(req);
     if (!hostname) {
       socket.destroy();
       return;
