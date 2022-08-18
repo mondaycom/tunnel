@@ -34,7 +34,7 @@ export default function (opt: ServerOptions) {
   const app = new Koa();
   const router = new Router();
 
-  router.get('/api/status', async (ctx, next) => {
+  router.get('/api/status', async (ctx) => {
     const stats = manager.stats;
     ctx.body = {
       tunnels: stats.tunnels,
@@ -43,11 +43,11 @@ export default function (opt: ServerOptions) {
     };
   });
 
-  router.get('/api/tunnels/:id/status', async (ctx, next) => {
+  router.get('/api/tunnels/:id/status', async (ctx) => {
     const clientId = ctx.params['id'];
     const client = manager.getClient(clientId);
     if (!client) {
-      ctx.throw(404);
+      ctx.throw(404, 'Tunnel not found');
       return;
     }
 
@@ -57,68 +57,42 @@ export default function (opt: ServerOptions) {
     };
   });
 
-  app.use(router.routes());
-  app.use(router.allowedMethods());
-
-  // root endpoint
-  app.use(async (ctx, next) => {
-    const path = ctx.request.path;
-
-    // skip anything not on the root path
-    if (path !== '/') {
-      await next();
+  router.post('/api/tunnels', async (ctx) => {
+    const hostname = ctx.headers.host;
+    if (!hostname) {
+      ctx.throw(400, 'Host header is required');
       return;
     }
 
-    const isNewClientRequest = ctx.query['new'] !== undefined;
-    if (isNewClientRequest) {
-      const reqId = humanReadableId();
-      logger?.debug('making new client with id %s', reqId);
-      const info = (await manager.newClient(reqId)) as NewClientResponse;
+    const clientId = humanReadableId();
+    logger?.debug('making new client with id %s', clientId);
+    const info = (await manager.newClient(clientId)) as NewClientResponse;
 
-      const url = schema + '://' + info.id + '.' + ctx.request.host;
-      info.url = url;
-      ctx.body = info;
-      return;
-    }
-
-    logger?.debug('existing conn req: %o', ctx.request);
-
-    // no new client request, send to landing page
-    // TODO: implement a landing page
-    // ctx.redirect(landingPage);
-    ctx.status = 404;
-    return;
+    const url = schema + '://' + info.id + '.' + hostname;
+    info.url = url;
+    ctx.body = info;
   });
 
-  // anything after the / path is a request for a specific client name
-  // This is a backwards compat feature
-  app.use(async (ctx, next) => {
-    const parts = ctx.request.path.split('/');
-
-    // any request with several layers of paths is not allowed
-    // rejects /foo/bar
-    // allow /foo
-    if (parts.length !== 2) {
-      await next();
+  router.post('/api/tunnels/:id', async (ctx) => {
+    const hostname = ctx.headers.host;
+    if (!hostname) {
+      ctx.throw(400, 'Host header is required');
       return;
     }
 
-    const reqId = parts[1];
-
-    // limit requested hostnames to 63 characters
-    if (!/^(?:[a-z0-9][a-z0-9-]{4,63}[a-z0-9]|[a-z0-9]{4,63})$/.test(reqId)) {
-      const msg =
-        'Invalid subdomain. Subdomains must be lowercase and between 4 and 63 alphanumeric characters.';
-      ctx.status = 403;
-      ctx.body = {
-        message: msg,
-      };
+    const clientId = ctx.params['id'];
+    if (
+      !/^(?:[a-z0-9][a-z0-9-]{4,63}[a-z0-9]|[a-z0-9]{4,63})$/.test(clientId)
+    ) {
+      ctx.throw(
+        400,
+        'Invalid subdomain. Subdomains must be lowercase and between 4 and 63 alphanumeric characters.'
+      );
       return;
     }
 
-    logger?.debug('making new client with id %s', reqId);
-    const info = await manager.newClient(reqId);
+    logger?.debug('making new client with id %s', clientId);
+    const info = await manager.newClient(clientId);
 
     const url = schema + '://' + info.id + '.' + ctx.request.host;
     const newBody: NewClientResponse = {
@@ -126,8 +100,10 @@ export default function (opt: ServerOptions) {
       url,
     };
     ctx.body = newBody;
-    return;
   });
+
+  app.use(router.routes());
+  app.use(router.allowedMethods());
 
   const server = http.createServer();
 

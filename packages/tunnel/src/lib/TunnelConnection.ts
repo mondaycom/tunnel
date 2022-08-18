@@ -60,16 +60,14 @@ export class TunnelConnection {
   // callback with connection info
   private async init() {
     const opt = this.opts;
-
-    const baseUri = `${opt.host}/`;
-    // no subdomain at first, maybe use requested domain
-    const assignedDomain = opt.subdomain;
-    // where to quest
-    const uri = baseUri + (assignedDomain || '?new');
     const logger = this.logger;
 
+    const uri = opt.subdomain
+      ? `${opt.host}/api/tunnels/${opt.subdomain}`
+      : `${opt.host}/api/tunnels`;
+
     logger?.debug('retrieving tunnel information from %s', uri);
-    const res = await axios.get(uri, {
+    const res = await axios.post(uri, {
       responseType: 'json',
     });
     const body = res.data;
