@@ -22,7 +22,6 @@ export default function (opt: ServerOptions) {
   const logger = opt.logger;
   const validHosts = opt.domain ? [opt.domain] : undefined;
   const myTldjs = tldjs.fromUserSettings({ validHosts });
-  const landingPage = opt.landing || 'https://localtunnel.github.io/www/';
 
   function getClientIdFromHostname(hostname: string) {
     return myTldjs.getSubdomain(hostname);

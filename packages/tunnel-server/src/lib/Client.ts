@@ -1,6 +1,5 @@
 import http from 'http';
 import pump from 'pump';
-import EventEmitter from 'events';
 import TunnelAgent from './TunnelAgent';
 import internal from 'stream';
 import { hasCode } from '@mondaydotcomorg/tunnel-common';

@@ -13,20 +13,6 @@ describe('Server', () => {
     await new Promise((resolve) => server.close(resolve));
   });
 
-  it('should redirect root requests to landing page', async () => {
-    const server = createServer();
-    const res = await request(server).get('/');
-    assert.equal('https://localtunnel.github.io/www/', res.headers.location);
-  });
-
-  it('should support custom base domains', async () => {
-    const server = createServer({
-      domain: 'domain.example.com',
-    });
-
-    const res = await request(server).get('/');
-    assert.equal('https://localtunnel.github.io/www/', res.headers.location);
-  });
 
   it('reject long domain name requests', async () => {
     const server = createServer();
