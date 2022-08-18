@@ -91,7 +91,7 @@ class TunnelAgent extends Agent {
         this.logger?.info('tcp server listening on port: %d', port);
 
         resolve({
-          // port for lt client tcp connections
+          // port for mtunnel client tcp connections
           port: port,
         });
       });

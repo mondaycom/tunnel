@@ -8,7 +8,7 @@ import pino from 'pino';
 import pretty from 'pino-pretty';
 
 const { argv } = yargs
-  .usage('Usage: lt --port [num] <options>')
+  .usage('Usage: mtunnel --port [num] <options>')
   .env('TUNNEL')
   .option('port', {
     alias: 'p',
