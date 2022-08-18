@@ -1,8 +1,8 @@
-# monday.com Tunnel
+# @mondaydotcomorg/tunnel
 
-Monday.com Tunnel exposes your localhost to the world for easy testing and sharing! No need to mess with DNS or deploy just to test out your changes.
+tunnel exposes your localhost to the world for easy testing and sharing! No need to mess with DNS or deploy just to have others test out your changes.
 
-Great for testing mobile apps connected to your locally running backend or running your appexternal services like monday.com which require a public url for callbacks.
+Great for working with browser testing tools like browserling or external api callback services like twilio which require a public url for callbacks.
 
 ## Quickstart
 

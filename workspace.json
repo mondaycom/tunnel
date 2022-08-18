@@ -3,8 +3,8 @@
   "version": 2,
   "projects": {
     "demo-app": "packages/demo-app",
-    "localtunnel": "packages/localtunnel",
-    "localtunnel-common": "packages/localtunnel-common",
-    "localtunnel-server": "packages/localtunnel-server"
+    "tunnel": "packages/tunnel",
+    "tunnel-common": "packages/tunnel-common",
+    "tunnel-server": "packages/tunnel-server"
   }
 }

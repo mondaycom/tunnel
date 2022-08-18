@@ -26,11 +26,7 @@
       },
       "configurations": {
         "production": {
-          "args": [
-            "--host=http://tunnel.monday.app",
-            "--debug",
-            "--print-requests"
-          ]
+          "args": ["--port=8091", "--debug", "--print-requests"]
         }
       }
     },

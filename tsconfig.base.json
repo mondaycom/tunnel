@@ -18,13 +18,11 @@
     "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
-      "@mondaydotcomorg/localtunnel": ["packages/localtunnel/src/index.ts"],
-      "@mondaydotcomorg/localtunnel-common": [
-        "packages/localtunnel-common/src/index.ts"
+      "@mondaydotcomorg/tunnel": ["packages/tunnel/src/index.ts"],
+      "@mondaydotcomorg/tunnel-server": [
+        "packages/tunnel-server/src/index.ts"
       ],
-      "@mondaydotcomorg/localtunnel-server": [
-        "packages/localtunnel-server/src/index.ts"
-      ]
+      "@mondaydotcomorg/tunnel-common": ["packages/tunnel-common/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
