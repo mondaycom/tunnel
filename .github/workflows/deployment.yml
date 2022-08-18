@@ -1,0 +1,15 @@
+name: Deploy
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: gcp
+    steps:
+      - uses: 'google-github-actions/auth@v0'
+        with:
+          credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
+      - uses: 'google-github-actions/setup-gcloud@v0'
+      - name: 'Update VM container'
+        run: 'gcloud compute instances update-container localtunnel-nginx-r7jf --zone us-central1-a --container-image=us-east1-docker.pkg.dev/monday-localtunnel/localtunnel/localtunnel-server:latest'
