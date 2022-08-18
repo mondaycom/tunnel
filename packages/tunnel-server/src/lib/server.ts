@@ -39,6 +39,7 @@ export default function (opt: ServerOptions) {
     ctx.body = {
       tunnels: stats.tunnels,
       mem: process.memoryUsage(),
+      cpu: process.cpuUsage(),
     };
   });
 
