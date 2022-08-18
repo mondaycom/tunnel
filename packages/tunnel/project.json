@@ -17,6 +17,7 @@
       "executor": "@nrwl/node:node",
       "options": {
         "buildTarget": "tunnel:build",
+        "port": 9229,
         "args": [
           "--port=8091",
           "--host=http://localhost:8089",
