@@ -58,7 +58,7 @@ The tunnel client is also usable through an API (for test integration, automatio
 Creates a new tunnel to the specified local `port`. Will return a Promise that resolves once you have been assigned a public tunnel url. `options` can be used to request a specific `subdomain`. A `callback` function can be passed, in which case it won't return a Promise. This exists for backwards compatibility with the old Node-style callback API. You may also pass a single options object with `port` as a property.
 
 ```js
-const tunnel = require('tunnel');
+import createTunnel from '@mondaydotcomorg/tunnel';
 
 (async () => {
   const tunnel = await tunnel({ port: 3000 });
