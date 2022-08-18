@@ -65,7 +65,7 @@
       "executor": "@nx-tools/nx-docker:build",
       "options": {
         "load": true,
-        "tags": ["monday/localtunnel-server:latest"]
+        "tags": ["monday/tunnel-server:latest"]
       },
       "dependsOn": ["build"],
       "configurations": {
