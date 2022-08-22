@@ -5,6 +5,11 @@
   "bin": {
     "mtunnel-server": "src/cli.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mondaycom/tunnel",
+    "directory": "packages/tunnel-server"
+  },
   "dependencies": {
     "@alexjamesmalcolm/human-readable-ids": "^1.0.12",
     "@mondaydotcomorg/tunnel-common": "*",

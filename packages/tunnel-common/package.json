@@ -1,5 +1,10 @@
 {
   "name": "@mondaydotcomorg/tunnel-common",
   "version": "0.0.1",
-  "type": "commonjs"
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mondaycom/tunnel",
+    "directory": "packages/tunnel-common"
+  }
 }
