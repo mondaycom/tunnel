@@ -1,0 +1,36 @@
+version: '3.7'
+
+services:
+  server:
+    image: monday/tunnel-server:latest
+    network_mode: host
+    environment:
+      - TUNNEL_SERVER_SECURE=true
+      - TUNNEL_SERVER_DEBUG=true
+      - TUNNEL_SERVER_MAX_SOCKETS=4
+      - TUNNEL_SERVER_DOMAIN=${DOMAIN}
+      - TUNNEL_SERVER_PORT=${SERVER_PORT}
+
+  docs:
+    image: monday/tunnel-docs:latest
+    environment:
+      - PORT=${DOCS_PORT}
+
+  nginx:
+    image: nginx:1.23.1-alpine
+    depends_on:
+      - server
+      - docs
+    ports:
+      - "443:443/tcp"
+    environment:
+      - DOMAIN=${DOMAIN}
+      - SERVER_PORT=${SERVER_PORT}
+      - DOCS_PORT=${DOCS_PORT}
+      - SSL_CERT=${SSL_CERT}
+      - SSL_CERT_KEY=${SSL_CERT_KEY}
+    volumes:
+      - ./nginx/templates:/etc/nginx/templates:ro
+      - ./nginx/certs:/etc/nginx/certs:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

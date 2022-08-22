@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  server:
+    image: us-east1-docker.pkg.dev/monday-localtunnel/localtunnel/localtunnel-server:latest
+    restart: always
+
+  nginx:
+    restart: always
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt
