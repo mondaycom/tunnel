@@ -6,7 +6,7 @@ This repo is the server component. If you are just looking for the CLI localtunn
 
 ## overview
 
-The default localtunnel client connects to the `tunnel.monday.com` server. You can, however, easily set up and run your own server. In order to run your own localtunnel server you must ensure that your server can meet the following requirements:
+The default localtunnel client connects to the `tunnel.monday.app` server. You can, however, easily set up and run your own server. In order to run your own localtunnel server you must ensure that your server can meet the following requirements:
 
 - You can set up DNS entries for your `domain.tld` and `*.domain.tld` (or `sub.domain.tld` and `*.sub.domain.tld`).
 - The server can accept incoming TCP connections for any non-root TCP port (i.e. ports over 1000).

@@ -9,6 +9,7 @@
   position: relative;
   overflow: hidden;
   background-color: #0F1048;
+  color: white;
 }
 
 @media screen and (max-width: 966px) {
