@@ -1,4 +1,3 @@
-import { parse } from 'node:url';
 import axios from 'axios';
 
 import { TunnelCluster, TunnelRequestInfo } from './TunnelCluster';
@@ -14,7 +13,11 @@ export class TunnelConnection {
 
   $open = new Subject<string>();
   $error = new Subject<Error>();
-  $close = new BehaviorSubject<boolean>(false);
+  private closeSubject = new BehaviorSubject<boolean>(false);
+  $close = this.closeSubject.asObservable().pipe(
+    skipWhile((x) => !x),
+    first()
+  );
   $request = new Subject<TunnelRequestInfo>();
   logger?: Logger;
 
@@ -37,7 +40,7 @@ export class TunnelConnection {
   }
 
   close() {
-    this.$close.next(true);
+    this.closeSubject.next(true);
   }
 
   private getInfo(body: NewClientResponse): TunnelInfo {
@@ -101,12 +104,7 @@ export class TunnelConnection {
       tunnelCount++;
       this.logger?.debug({ tunnelId }, 'tunnel open [total: %d]', tunnelCount);
 
-      const closeSub = this.$close
-        .pipe(
-          skipWhile((x) => !x),
-          first()
-        )
-        .subscribe(() => socket.destroy());
+      const closeSub = this.$close.subscribe(() => socket.destroy());
 
       socket.once('close', () => {
         closeSub.unsubscribe();
@@ -117,7 +115,7 @@ export class TunnelConnection {
     tunnelCluster.$dead.subscribe(({ tunnelId }) => {
       tunnelCount--;
       this.logger?.debug({ tunnelId }, 'tunnel dead [total: %d]', tunnelCount);
-      this.$close
+      this.closeSubject
         .pipe(
           first(),
           filter((x) => !x)
