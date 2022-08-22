@@ -1,11 +1,5 @@
-# tunnel-common
+# Monday.com Tunnel Common
 
-This library was generated with [Nx](https://nx.dev).
+This library is a shared logic and types of Monday.com Tunnel [client](https://github.com/mondaycom/tunnel/tree/main/packages/tunnel) and [server](https://github.com/mondaycom/tunnel/tree/main/packages/tunnel-server).
 
-## Building
-
-Run `nx build tunnel-common` to build the library.
-
-## Running unit tests
-
-Run `nx test tunnel-common` to execute the unit tests via [Jest](https://jestjs.io).
+See [docs](https://tunnel.monday.app) for more details and setup instructions.
