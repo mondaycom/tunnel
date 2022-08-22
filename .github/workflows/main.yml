@@ -17,6 +17,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.7.0'
+          cache: 'yarn'
+      - run: corepack enable
       - uses: docker/setup-qemu-action@v1
       - uses: docker/setup-buildx-action@v1
       - uses: actions/checkout@v3
@@ -27,14 +29,14 @@ jobs:
           git config user.name "GitHub Bot"
           git config user.email "gituser@monday.com"
       - uses: nrwl/nx-set-shas@v2
-      - run: npm ci
+      - run: yarn install --frozen-lockfile
       - name: Build
-        run: npx nx run-many --configuration=production --target=build --parallel=3
+        run: yarn nx run-many --configuration=production --target=build --parallel=3
       - name: Set NPM auth token
         run: npm config --global set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
       - name: Create & publish a new version
         shell: bash
-        run: npx nx run-many --parallel=1 --base=last-release --target=version
+        run: yarn nx run-many --parallel=1 --base=last-release --target=version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag last-release
