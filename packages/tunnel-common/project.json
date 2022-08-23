@@ -32,6 +32,7 @@
       "executor": "@jscutlery/semver:version",
       "options": {
         "preset": "conventional",
+        "push": true,
         "postTargets": ["tunnel-common:publish"]
       }
     },
