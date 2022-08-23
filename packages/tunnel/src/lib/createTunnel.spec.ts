@@ -10,7 +10,7 @@ import createTunnel from './createTunnel';
 
 let fakePort: number;
 
-before((done) => {
+beforeAll((done) => {
   const server = http.createServer();
   server.on('request', (req, res) => {
     res.write(req.headers.host);

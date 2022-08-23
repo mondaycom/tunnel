@@ -9,13 +9,6 @@ describe('ClientManager', () => {
     assert.equal(manager.stats.tunnels, 0);
   });
 
-  it('should create a new client with random id', async () => {
-    const manager = new ClientManager();
-    const client = await manager.newClient();
-    assert(manager.hasClient(client.id));
-    manager.removeClient(client.id);
-  });
-
   it('should create a new client with id', async () => {
     const manager = new ClientManager();
     const client = await manager.newClient('foobar');
