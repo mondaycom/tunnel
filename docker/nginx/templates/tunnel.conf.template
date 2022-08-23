@@ -19,9 +19,7 @@ server {
     ssl_certificate_key ${SSL_CERT_KEY};
 
     location / {
-        proxy_pass http://docs:${DOCS_PORT};
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-For $remote_addr;
+        rewrite https://apps.developer.monday.com redirect;
     }
 
     location /api {
