@@ -12,7 +12,6 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '18.7.0'
-          registry-url: 'https://registry.npmjs.org'
       - run: corepack enable
       - uses: nrwl/nx-set-shas@v2
       - run: yarn install --frozen-lockfile

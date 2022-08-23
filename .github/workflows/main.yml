@@ -37,7 +37,7 @@ jobs:
         run: npm config --global set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
       - name: Create & publish a new version
         shell: bash
-        run: yarn nx run-many --parallel=1 --base=last-release --target=version
+        run: yarn nx run-many --parallel=1 --target=version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Tag last-release
