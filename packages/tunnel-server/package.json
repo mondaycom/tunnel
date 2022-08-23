@@ -1,6 +1,6 @@
 {
   "name": "@mondaydotcomorg/tunnel-server",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "type": "commonjs",
   "bin": {
     "mtunnel-server": "src/cli.js"
