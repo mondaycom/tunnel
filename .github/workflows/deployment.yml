@@ -17,4 +17,13 @@ jobs:
           credentials_json: '${{ secrets.GCP_CREDENTIALS }}'
       - uses: 'google-github-actions/setup-gcloud@v0'
       - name: 'Trigger deployment script'
-        run: 'gcloud compute ssh localtunnel-nginx-r7jf --zone=us-central1-a --ssh-flag="-vvv" --command="mktemp yolo.XXX" -q'
+        run: >
+          gcloud compute ssh localtunnel-nginx-r7jf
+          --zone=us-central1-a
+          --ssh-flag="-v"
+          --command="rm -rf tunnel
+            && git clone https://github.com/mondaycom/tunnel.git
+            && cd tunnel/docker && export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+            && docker compose pull
+            && docker compose --env-file=.env.prod up -d"
+          -q
