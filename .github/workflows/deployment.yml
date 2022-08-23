@@ -22,8 +22,8 @@ jobs:
           --zone=us-central1-a
           --ssh-flag="-v"
           --command="rm -rf tunnel
-            && git clone https://github.com/mondaycom/tunnel.git
-            && cd tunnel/docker && export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
-            && docker compose pull
-            && docker compose --env-file=.env.prod up -d"
+          && git clone https://github.com/mondaycom/tunnel.git
+          && cd tunnel/docker && export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
+          && docker compose pull
+          && docker compose --env-file=.env.prod up -d"
           -q
