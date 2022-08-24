@@ -1,11 +1,22 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 import { TunnelCluster, TunnelRequestInfo } from './TunnelCluster';
 import { NewClientResponse } from '@mondaydotcomorg/tunnel-common';
 import { filter, first, mergeMap, retry, skipWhile } from 'rxjs/operators';
-import { BehaviorSubject, Subject, from, lastValueFrom, range } from 'rxjs';
+import {
+  BehaviorSubject,
+  Subject,
+  from,
+  lastValueFrom,
+  range,
+  throwError,
+  timer,
+} from 'rxjs';
 import { Logger } from 'pino';
 import { TunnelInfo, TunnelOptions } from './types';
+import { logger } from '../cli';
+
+const RETRY_MS = 1000;
 
 export class TunnelConnection {
   tunnelCluster?: TunnelCluster;
@@ -27,7 +38,32 @@ export class TunnelConnection {
 
   async open(): Promise<TunnelInfo> {
     const info = await lastValueFrom(
-      from(this.init()).pipe(retry({ delay: 1000 }))
+      from(this.init()).pipe(
+        retry({
+          delay(error, retryCount) {
+            if (error instanceof AxiosError) {
+              if (error.code !== AxiosError.ERR_BAD_REQUEST) {
+                logger?.warn(
+                  'retrying connection to the server (attempt %d)...',
+                  retryCount
+                );
+                return timer(RETRY_MS);
+              }
+
+              return throwError(
+                () =>
+                  new Error(
+                    typeof error.response?.data === 'string'
+                      ? error.response?.data
+                      : error.message
+                  )
+              );
+            }
+
+            return throwError(() => error);
+          },
+        })
+      )
     );
 
     if (!info) {
@@ -46,6 +82,10 @@ export class TunnelConnection {
   private getInfo(body: NewClientResponse): TunnelInfo {
     const { id, ip, port, url, maxConnCount } = body;
     const { host, port: localPort, localHost } = this.opts;
+
+    if (!url) {
+      throw new Error('server did not return a tunnel URL');
+    }
 
     return {
       clientId: id,
@@ -73,15 +113,8 @@ export class TunnelConnection {
     const res = await axios.post(uri, {
       responseType: 'json',
     });
-    const body = res.data;
-    logger?.debug('got tunnel information: %o', res.data);
-    if (res.status !== 200) {
-      throw new Error(
-        (body && body.message) ||
-          'tunnel server returned an error, please try again'
-      );
-    }
-    this.info = this.getInfo(body);
+    this.info = this.getInfo(res.data);
+    logger?.debug('got tunnel information: %o', this.info);
     return this.info;
   }
 
