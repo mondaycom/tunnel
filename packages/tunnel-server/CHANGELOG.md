@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.1.2](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.1...tunnel-server-0.1.2) (2022-08-31)
+
+
+### Bug Fixes
+
+* always read the socket data ([c8a2e32](https://github.com/mondaycom/tunnel/commit/c8a2e3229755cea252d9d544c3fac4dddbfd522a))
+
 ### [0.1.1](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.0...tunnel-server-0.1.1) (2022-08-23)
 
 ## 0.1.0 (2022-08-23)
