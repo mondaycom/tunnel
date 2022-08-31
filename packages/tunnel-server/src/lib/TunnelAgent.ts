@@ -134,6 +134,10 @@ class TunnelAgent extends Agent {
       }
     });
 
+    socket.on('data', () => {
+      // always make sure the data is read to prevent socket hanging
+    });
+
     // close will be emitted after this
     socket.once('error', (err) => {
       this.logger?.debug('socket error: %s', err);
@@ -149,7 +153,7 @@ class TunnelAgent extends Agent {
     this.connectedSockets += 1;
     const address = socket.address() as AddressInfo;
     this.logger?.debug(
-      'new connection from: %s:%s',
+      'new connection from %s:%s',
       address.address,
       address.port
     );
