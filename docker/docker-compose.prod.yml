@@ -9,3 +9,4 @@ services:
     restart: always
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt
+      - /etc/apache2/.htpasswd:/etc/nginx/conf.d/.htpasswd
