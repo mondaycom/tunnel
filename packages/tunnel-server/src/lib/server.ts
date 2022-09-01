@@ -7,6 +7,9 @@ import { Logger } from 'pino';
 
 import ClientManager from './ClientManager';
 import { NewClientResponse } from '@mondaydotcomorg/tunnel-common';
+import { register as promRegister, collectDefaultMetrics } from 'prom-client';
+
+collectDefaultMetrics();
 
 export type ServerOptions = {
   domain?: string;
@@ -106,6 +109,16 @@ export default function (opt: ServerOptions) {
       url,
     };
     ctx.body = newBody;
+  });
+
+  router.get('/api/metrics', async (ctx) => {
+    try {
+      ctx.set('Content-Type', promRegister.contentType);
+      ctx.body = await promRegister.metrics();
+    } catch (ex) {
+      ctx.status = 500;
+      ctx.body = ex;
+    }
   });
 
   app.use(router.routes());

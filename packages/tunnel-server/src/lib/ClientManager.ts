@@ -5,6 +5,13 @@ import { Logger } from 'pino';
 import Client from './Client';
 import TunnelAgent from './TunnelAgent';
 
+import { Gauge } from 'prom-client';
+
+const connectedClientsHistogram = new Gauge({
+  name: 'tunnel_server_connected_clients',
+  help: 'Number of connected clients',
+});
+
 type ClientManagerOptions = {
   maxTcpSockets?: number;
   logger?: Logger;
@@ -65,6 +72,7 @@ class ClientManager {
     try {
       const info = await agent.listen();
       ++stats.tunnels;
+      connectedClientsHistogram.inc();
       return {
         id: id,
         port: info.port,
@@ -83,6 +91,7 @@ class ClientManager {
     if (!client) {
       return;
     }
+    connectedClientsHistogram.dec();
     --this.stats.tunnels;
     this.clients.delete(id);
     client.close();
