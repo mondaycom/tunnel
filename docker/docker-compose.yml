@@ -25,7 +25,6 @@ services:
     environment:
       - DOMAIN=${DOMAIN}
       - SERVER_PORT=${SERVER_PORT}
-      - DOCS_PORT=${DOCS_PORT}
       - SSL_CERT=${SSL_CERT}
       - SSL_CERT_KEY=${SSL_CERT_KEY}
     volumes:
