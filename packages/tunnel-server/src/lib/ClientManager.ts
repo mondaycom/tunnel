@@ -5,11 +5,20 @@ import { Logger } from 'pino';
 import Client from './Client';
 import TunnelAgent from './TunnelAgent';
 
-import { Gauge } from 'prom-client';
+import { Counter, Gauge } from 'prom-client';
 
-const connectedClientsHistogram = new Gauge({
+const connectedClientsGauge = new Gauge({
   name: 'tunnel_server_connected_clients',
   help: 'Number of connected clients',
+});
+
+const totalCreatedTunnelsCounter = new Counter({
+  name: 'tunnel_server_total_created_tunnels',
+  help: 'Total created tunnels',
+});
+const totalCreatedTunnelsWithSubdomainCounter = new Counter({
+  name: 'tunnel_server_total_created_custom_subdomain_tunnels',
+  help: 'Total created tunnels with custom subdomain',
 });
 
 type ClientManagerOptions = {
@@ -38,14 +47,13 @@ class ClientManager {
   // create a new tunnel with `id`
   // if the id is already used, a random id is assigned
   // if the tunnel could not be created, throws an error
-  async newClient(id: string): Promise<NewClientResult> {
+  async newClient(requestedId?: string): Promise<NewClientResult> {
     const clients = this.clients;
     const stats = this.stats;
 
-    // can't ask for id already is use
-    if (this.clients.has(id)) {
-      id = humanReadableId();
-    }
+    const id = this.getNewClientId(requestedId);
+
+    totalCreatedTunnelsCounter.inc();
 
     const maxSockets = this.opt.maxTcpSockets;
     const agent = new TunnelAgent({
@@ -72,9 +80,9 @@ class ClientManager {
     try {
       const info = await agent.listen();
       ++stats.tunnels;
-      connectedClientsHistogram.inc();
+      connectedClientsGauge.inc();
       return {
-        id: id,
+        id,
         port: info.port,
         maxConnCount: maxSockets,
       };
@@ -91,7 +99,7 @@ class ClientManager {
     if (!client) {
       return;
     }
-    connectedClientsHistogram.dec();
+    connectedClientsGauge.dec();
     --this.stats.tunnels;
     this.clients.delete(id);
     client.close();
@@ -103,6 +111,29 @@ class ClientManager {
 
   getClient(id: string) {
     return this.clients.get(id);
+  }
+
+  private getNewClientId(requestedId: string | undefined): string {
+    if (requestedId) {
+      // can't ask for id already is use
+      if (this.clients.has(requestedId)) {
+        const id = humanReadableId();
+        this.logger?.debug(
+          'making new client with generated id %s - requested client id %s was already in use',
+          id,
+          requestedId
+        );
+        return id;
+      } else {
+        this.logger?.debug('making new client with custom id %s', requestedId);
+        totalCreatedTunnelsWithSubdomainCounter.inc();
+        return requestedId;
+      }
+    }
+
+    const id = humanReadableId();
+    this.logger?.debug('making new client with generated id %s', id);
+    return id;
   }
 }
 

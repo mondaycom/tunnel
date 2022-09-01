@@ -4,8 +4,24 @@ import { hasCode } from '@mondaydotcomorg/tunnel-common';
 import { AddressInfo, EventEmitter } from 'ws';
 import { Subject } from 'rxjs';
 import { Logger } from 'pino';
+import { Gauge } from 'prom-client';
 
 const DEFAULT_MAX_SOCKETS = 10;
+
+const connectedSocketsGauge = new Gauge({
+  name: 'tunnel_server_connected_sockets',
+  help: 'Number of connected sockets',
+});
+
+const maxSocketsGauge = new Gauge({
+  name: 'tunnel_server_max_sockets',
+  help: 'Number of maximum possible sockets that can be created',
+});
+
+const waitingConnectionsGauge = new Gauge({
+  name: 'tunnel_server_waiting_connections',
+  help: 'Number of connected clients',
+});
 
 type TunnelAgentOptions = {
   clientId?: string;
@@ -89,6 +105,7 @@ class TunnelAgent extends Agent {
       server.listen(() => {
         const port = (server.address() as AddressInfo).port;
         this.logger?.info('tcp server listening on port: %d', port);
+        maxSocketsGauge.inc(this.maxSockets);
 
         resolve({
           // port for mtunnel client tcp connections
@@ -104,6 +121,7 @@ class TunnelAgent extends Agent {
     // flush any waiting connections
     for (const conn of this.waitingCreateConn) {
       conn(new Error('closed'), null);
+      waitingConnectionsGauge.dec();
     }
     this.waitingCreateConn = [];
     this.$end.next();
@@ -121,6 +139,7 @@ class TunnelAgent extends Agent {
     socket.once('close', (hadError) => {
       this.logger?.debug('closed socket (error: %s)', hadError);
       this.connectedSockets -= 1;
+      connectedSocketsGauge.dec();
       // remove the socket from available list
       const idx = this.availableSockets.indexOf(socket);
       if (idx >= 0) {
@@ -151,6 +170,7 @@ class TunnelAgent extends Agent {
     }
 
     this.connectedSockets += 1;
+    connectedSocketsGauge.inc();
     const address = socket.address() as AddressInfo;
     this.logger?.debug(
       'new connection from %s:%s',
@@ -160,6 +180,7 @@ class TunnelAgent extends Agent {
 
     // if there are queued callbacks, give this socket now and don't queue into available
     const fn = this.waitingCreateConn.shift();
+    waitingConnectionsGauge.dec();
     if (fn) {
       this.logger?.debug('giving socket to queued conn request');
       setTimeout(() => {
@@ -193,6 +214,7 @@ class TunnelAgent extends Agent {
     // wait until we have one
     if (!sock) {
       this.waitingCreateConn.push(cb);
+      waitingConnectionsGauge.inc();
       this.logger?.debug('waiting connected: %s', this.connectedSockets);
       this.logger?.debug('waiting available: %s', this.availableSockets.length);
       return;
@@ -207,6 +229,7 @@ class TunnelAgent extends Agent {
     this.$online.complete();
     this.$offline.complete();
     this.$end.complete();
+    maxSocketsGauge.dec(this.maxSockets);
     super.destroy();
   }
 }

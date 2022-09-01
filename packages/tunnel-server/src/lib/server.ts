@@ -1,15 +1,23 @@
 import Koa from 'koa';
 import tldjs from 'tldjs';
 import http, { IncomingHttpHeaders } from 'http';
-import { humanReadableId } from '@alexjamesmalcolm/human-readable-ids';
 import Router from 'koa-router';
 import { Logger } from 'pino';
 
 import ClientManager from './ClientManager';
 import { NewClientResponse } from '@mondaydotcomorg/tunnel-common';
-import { register as promRegister, collectDefaultMetrics } from 'prom-client';
+import {
+  register as promRegister,
+  collectDefaultMetrics,
+  Counter,
+} from 'prom-client';
 
 collectDefaultMetrics();
+
+const totalTunneledRequestsCounter = new Counter({
+  name: 'tunnel_server_total_tunneled_requests',
+  help: 'Total tunneled requests',
+});
 
 export type ServerOptions = {
   domain?: string;
@@ -72,9 +80,7 @@ export default function (opt: ServerOptions) {
       return;
     }
 
-    const clientId = humanReadableId();
-    logger?.debug('making new client with id %s', clientId);
-    const info = (await manager.newClient(clientId)) as NewClientResponse;
+    const info = (await manager.newClient()) as NewClientResponse;
 
     const url = schema + '://' + info.id + '.' + hostname;
     info.url = url;
@@ -100,7 +106,6 @@ export default function (opt: ServerOptions) {
       return;
     }
 
-    logger?.debug('making new client with id %s', clientId);
     const info = await manager.newClient(clientId);
 
     const url = schema + '://' + info.id + '.' + ctx.request.host;
@@ -150,6 +155,7 @@ export default function (opt: ServerOptions) {
       return;
     }
 
+    totalTunneledRequestsCounter.inc();
     client.handleRequest(req, res);
   });
 
