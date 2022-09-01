@@ -1,5 +1,8 @@
 version: '3.7'
 
+volumes:
+    prometheus_data: {}
+
 services:
   server:
     image: monday/tunnel-server:latest
@@ -28,3 +31,17 @@ services:
       - ./nginx/certs:/etc/nginx/certs:ro
     extra_hosts:
       - "host.docker.internal:host-gateway"
+
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    depends_on:
+      - server
+    restart: always
+    ports:
+      - 9090:9090
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
