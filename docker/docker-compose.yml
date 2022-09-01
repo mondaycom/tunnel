@@ -1,7 +1,9 @@
 version: '3.7'
 
+name: tunnel
+
 volumes:
-    prometheus_data: {}
+  prometheus_data: {}
 
 services:
   server:
@@ -37,8 +39,6 @@ services:
     depends_on:
       - server
     restart: always
-    ports:
-      - 9090:9090
     volumes:
       - ./prometheus/:/etc/prometheus/
       - prometheus_data:/prometheus
