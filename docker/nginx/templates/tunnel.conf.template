@@ -31,8 +31,8 @@ server {
         proxy_set_header Connection "Upgrade";
     }
 
-    location /prom {
-        proxy_pass http://prometheus:9090/;
+    location /prometheus {
+        proxy_pass http://prometheus:9090/prometheus;
     }
 }
 

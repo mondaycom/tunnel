@@ -46,6 +46,6 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--web.external-url=http://${DOMAIN}/prometheus'
-      - '--web.route-prefix=/'
+      - '--web.route-prefix=/prometheus'
     extra_hosts:
       - "host.docker.internal:host-gateway"
