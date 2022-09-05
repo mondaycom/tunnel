@@ -2,6 +2,18 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.2.0](https://github.com/mondaycom/tunnel/compare/tunnel-0.1.2...tunnel-0.2.0) (2022-09-05)
+
+
+### Features
+
+* add dotenv ([dd0f0f0](https://github.com/mondaycom/tunnel/commit/dd0f0f005b6a4cf975aa303d72fd3ccc373b1b9c))
+
+
+### Bug Fixes
+
+* re-open local connection on ECONNRESET ([8810824](https://github.com/mondaycom/tunnel/commit/8810824e69647aa82eb4ddd4c6d2d0543c23e69d))
+
 ### [0.1.2](https://github.com/mondaycom/tunnel/compare/tunnel-0.1.1...tunnel-0.1.2) (2022-08-24)
 
 
