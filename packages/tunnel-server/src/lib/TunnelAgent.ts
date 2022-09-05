@@ -2,7 +2,7 @@ import { Agent, ClientRequestArgs } from 'http';
 import net from 'net';
 import { hasCode } from '@mondaydotcomorg/tunnel-common';
 import { AddressInfo, EventEmitter } from 'ws';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { Logger } from 'pino';
 import { Gauge } from 'prom-client';
 
@@ -73,6 +73,10 @@ class TunnelAgent extends Agent {
 
     // new tcp server to service requests for this client
     this.server = net.createServer();
+
+    this.$end.pipe(take(1)).subscribe(() => {
+      maxSocketsGauge.dec(this.maxSockets);
+    });
   }
 
   stats() {
@@ -229,7 +233,6 @@ class TunnelAgent extends Agent {
     this.$online.complete();
     this.$offline.complete();
     this.$end.complete();
-    maxSocketsGauge.dec(this.maxSockets);
     super.destroy();
   }
 }

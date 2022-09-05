@@ -9,6 +9,12 @@
       "type": "node",
       "request": "attach",
       "port": 9230,
+    },
+    {
+      "name": "Debug tunnel",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
     }
   ]
 }

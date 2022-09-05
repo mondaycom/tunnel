@@ -2,7 +2,7 @@ import axios, { AxiosError } from 'axios';
 
 import { TunnelCluster, TunnelRequestInfo } from './TunnelCluster';
 import { NewClientResponse } from '@mondaydotcomorg/tunnel-common';
-import { filter, first, mergeMap, retry, skipWhile } from 'rxjs/operators';
+import { filter, first, map, mergeMap, retry, skipWhile } from 'rxjs/operators';
 import {
   BehaviorSubject,
   Subject,
@@ -11,6 +11,7 @@ import {
   range,
   throwError,
   timer,
+  defer,
 } from 'rxjs';
 import { Logger } from 'pino';
 import { TunnelInfo, TunnelOptions } from './types';
@@ -38,18 +39,24 @@ export class TunnelConnection {
 
   async open(): Promise<TunnelInfo> {
     const info = await lastValueFrom(
-      from(this.init()).pipe(
+      defer(() => this.init()).pipe(
+        mergeMap((info) => from(this.establish(info)).pipe(map(() => info))),
         retry({
           delay(error, retryCount) {
-            if (error instanceof AxiosError) {
-              if (error.code !== AxiosError.ERR_BAD_REQUEST) {
-                logger?.warn(
-                  'retrying connection to the server (attempt %d)...',
-                  retryCount
-                );
-                return timer(RETRY_MS);
-              }
+            if (
+              (error instanceof AxiosError &&
+                error.code !== AxiosError.ERR_BAD_REQUEST) ||
+              error.code === 'ECONNREFUSED'
+            ) {
+              logger?.warn(
+                '%s - retrying connection to the server (attempt %d)...',
+                error.code,
+                retryCount
+              );
+              return timer(RETRY_MS);
+            }
 
+            if (error instanceof AxiosError) {
               return throwError(
                 () =>
                   new Error(
@@ -65,12 +72,6 @@ export class TunnelConnection {
         })
       )
     );
-
-    if (!info) {
-      throw new Error("tunnel server didn't return any information");
-    }
-
-    this.establish(info);
 
     return info;
   }

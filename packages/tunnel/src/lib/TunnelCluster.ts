@@ -56,18 +56,14 @@ export class TunnelCluster {
 
     remote.setKeepAlive(true);
 
+    let connected = false;
+
     remote.on('error', (err) => {
       logger?.error('got remote connection error %s', err.message);
       remote.end();
 
-      // emit connection refused errors immediately, because they
-      // indicate that the tunnel can't be established.
-      if (hasCode(err) && err.code === 'ECONNREFUSED') {
-        this.$error.next(
-          new Error(
-            `${tunnelId} connection refused: ${this.remoteHostOrIp}:${this.opts.remotePort} (check your firewall settings)`
-          )
-        );
+      if (connected) {
+        this.$dead.next({ tunnelId });
       }
     });
     remote.on('data', (data) => {
@@ -83,6 +79,7 @@ export class TunnelCluster {
     // tunnel is considered open when remote connects
     return new Promise((resolve) => {
       remote.once('connect', () => {
+        connected = true;
         this.$open.next({ socket: remote, tunnelId });
         resolve(remote);
         this.connLocal(remote, tunnelId);
