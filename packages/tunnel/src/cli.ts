@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+import { config } from 'dotenv';
+config();
 
 import yargs from 'yargs';
 
