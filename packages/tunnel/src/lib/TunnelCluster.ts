@@ -126,7 +126,7 @@ export class TunnelCluster {
 
       remote.removeListener('close', remoteClose);
 
-      if (!hasCode(err) || err.code !== 'ECONNREFUSED') {
+      if (!hasCode(err) || err.code !== 'ECONNREFUSED' && err.code !== 'ECONNRESET') {
         remote.end();
         return;
       }
