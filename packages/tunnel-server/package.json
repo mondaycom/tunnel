@@ -10,6 +10,8 @@
     "url": "https://github.com/mondaycom/tunnel",
     "directory": "packages/tunnel-server"
   },
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts",
   "dependencies": {
     "@alexjamesmalcolm/human-readable-ids": "^1.0.12",
     "@mondaydotcomorg/tunnel-common": "*",
