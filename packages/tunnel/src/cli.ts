@@ -1,17 +1,13 @@
 #!/usr/bin/env node
-import { config } from 'dotenv';
-config();
-
-import yargs from 'yargs';
-
-import createTunnel from './lib/createTunnel';
-import { version } from '../package.json';
+import dotenv from 'dotenv';
+import yargs from 'yargs/yargs';
 import pino from 'pino';
 import pretty from 'pino-pretty';
+import { version } from '../package.json';
+import createTunnel from './lib/createTunnel';
 
-const { argv } = yargs
+const y = yargs(process.argv.slice(2))
   .usage('Usage: mtunnel --port [num] <options>')
-  .env('TUNNEL')
   .option('port', {
     alias: 'p',
     describe: 'Internal HTTP server port',
@@ -44,14 +40,33 @@ const { argv } = yargs
     describe: 'Print more verbose logs',
     type: 'boolean',
   })
+  .option('env-file', {
+    alias: 'e',
+    describe: 'Loads parameters from .env file',
+    default: '.env',
+    type: 'string',
+    conflicts: 'no-env-file',
+  })
+  .option('no-env-file', {
+    describe: 'Skips loading parameters from .env file',
+    type: 'boolean',
+    conflicts: 'env-file',
+  })
   .option('print-requests', {
     describe: 'Print basic request info',
     type: 'boolean',
   })
-  .help('help', 'Show this help and exit')
+  .env('TUNNEL')
+  .help('help', 'Show th-is help and exit')
   .version(version);
 
-export const logger = pino(
+let argv = y.parse();
+if (!argv['no-env-file']) {
+  dotenv.config({ path: argv['env-file'] });
+  argv = y.parse();
+}
+
+const logger = pino(
   {
     level: argv.debug ? 'debug' : 'info',
   },
