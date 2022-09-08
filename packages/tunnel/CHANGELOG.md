@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.3.0](https://github.com/mondaycom/tunnel/compare/tunnel-0.2.1...tunnel-0.3.0) (2022-09-08)
+
+
+### Features
+
+* add [no-]env-file arg ([62d1a46](https://github.com/mondaycom/tunnel/commit/62d1a46f3ada17dffedf9bb4a9b10c08ac07c4c4))
+
 ### [0.2.1](https://github.com/mondaycom/tunnel/compare/tunnel-0.2.0...tunnel-0.2.1) (2022-09-05)
 
 
