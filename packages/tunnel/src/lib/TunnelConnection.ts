@@ -14,7 +14,6 @@ import {
 } from 'rxjs';
 import { Logger } from 'pino';
 import { TunnelInfo, TunnelOptions } from './types';
-import { logger } from '../cli';
 
 const RETRY_MS = 1000;
 
@@ -40,10 +39,10 @@ export class TunnelConnection {
     const info = await lastValueFrom(
       from(this.init()).pipe(
         retry({
-          delay(error, retryCount) {
+          delay: (error, retryCount) => {
             if (error instanceof AxiosError) {
               if (error.code !== AxiosError.ERR_BAD_REQUEST) {
-                logger?.warn(
+                this.logger?.warn(
                   'retrying connection to the server (attempt %d)...',
                   retryCount
                 );
