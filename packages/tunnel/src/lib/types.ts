@@ -2,7 +2,7 @@ import { Logger } from "pino";
 
 export interface TunnelOptions {
   subdomain?: string;
-  host: string;
+  host?: string;
   localHost?: string;
   port: number;
   localPort?: number;

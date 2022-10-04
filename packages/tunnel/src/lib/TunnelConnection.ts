@@ -14,6 +14,7 @@ import {
 } from 'rxjs';
 import { Logger } from 'pino';
 import { TunnelInfo, TunnelOptions } from './types';
+import { TUNNEL_DEFAULT_HOST } from '../constants';
 
 const RETRY_MS = 1000;
 
@@ -84,7 +85,11 @@ export class TunnelConnection {
 
   private getInfo(body: NewClientResponse): TunnelInfo {
     const { id, ip, port, url, maxConnCount } = body;
-    const { host, port: localPort, localHost } = this.opts;
+    const {
+      host = TUNNEL_DEFAULT_HOST,
+      port: localPort,
+      localHost,
+    } = this.opts;
 
     if (!url) {
       throw new Error('server did not return a tunnel URL');
@@ -105,12 +110,12 @@ export class TunnelConnection {
   // initialize connection
   // callback with connection info
   private async init() {
-    const opt = this.opts;
+    const { host = TUNNEL_DEFAULT_HOST, subdomain } = this.opts;
     const logger = this.logger;
 
-    const uri = opt.subdomain
-      ? `${opt.host}/api/tunnels/${opt.subdomain}`
-      : `${opt.host}/api/tunnels`;
+    const uri = subdomain
+      ? `${host}/api/tunnels/${subdomain}`
+      : `${host}/api/tunnels`;
 
     logger?.debug('retrieving tunnel information from %s', uri);
     const res = await axios.post(uri, {

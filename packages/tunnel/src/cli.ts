@@ -5,6 +5,7 @@ import pino from 'pino';
 import pretty from 'pino-pretty';
 import { version } from '../package.json';
 import createTunnel from './lib/createTunnel';
+import { TUNNEL_DEFAULT_HOST } from './constants';
 
 const y = yargs(process.argv.slice(2))
   .usage('Usage: mtunnel --port [num] <options>')
@@ -17,7 +18,7 @@ const y = yargs(process.argv.slice(2))
   .option('host', {
     alias: 'h',
     describe: 'Upstream server providing forwarding',
-    default: 'https://tunnel.monday.app',
+    default: TUNNEL_DEFAULT_HOST,
   })
   .option('subdomain', {
     alias: 's',
