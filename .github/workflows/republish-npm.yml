@@ -1,0 +1,27 @@
+name: Republish NPM
+on:
+  workflow_dispatch:
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: gcp
+    steps:
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.7.0'
+      - run: corepack enable
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: nrwl/nx-set-shas@v2
+      - run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn nx run-many --configuration=production --target=build --parallel=3
+      - name: Set NPM registry
+        run: npm config --global set @mondaydotcomorg:registry https://registry.npmjs.org/
+      - name: Set NPM auth token
+        run: npm config --global set '//registry.npmjs.org/:_authToken' "${{ secrets.NPM_TOKEN }}"
+      - name: Republish NPM packages
+        shell: bash
+        run: yarn nx run-many --parallel=1 --target=publish
