@@ -2,6 +2,15 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+## [0.4.0](https://github.com/mondaycom/tunnel/compare/tunnel-0.3.0...tunnel-0.4.0) (2022-10-04)
+
+
+### Features
+
+* create url property for easier access ([1284905](https://github.com/mondaycom/tunnel/commit/128490577ec10a95c1dc94f2142bf3ccedc43694))
+* export createTunnel directly ([257118b](https://github.com/mondaycom/tunnel/commit/257118bea2d3337093e9b6fb083ff89208fb2b55))
+* set default tunnel host in createTunnel ([f636b3e](https://github.com/mondaycom/tunnel/commit/f636b3ea060cee6513c37aee5483e8a56b3eb4c5))
+
 ## [0.3.0](https://github.com/mondaycom/tunnel/compare/tunnel-0.2.1...tunnel-0.3.0) (2022-09-08)
 
 
