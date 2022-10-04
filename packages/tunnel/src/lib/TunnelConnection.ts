@@ -31,6 +31,10 @@ export class TunnelConnection {
   $request = new Subject<TunnelRequestInfo>();
   logger?: Logger;
 
+  get url() {
+    return this.info?.url;
+  }
+
   constructor(readonly opts: TunnelOptions) {
     this.logger = opts.logger;
   }
