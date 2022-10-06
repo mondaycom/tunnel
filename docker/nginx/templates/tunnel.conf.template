@@ -19,7 +19,7 @@ server {
     ssl_certificate_key ${SSL_CERT_KEY};
 
     location / {
-        rewrite https://developer.monday.com/apps/docs/ redirect;
+        return 302 https://developer.monday.com/apps/docs;
     }
 
     location /api {
