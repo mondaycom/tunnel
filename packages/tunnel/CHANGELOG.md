@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.4.1](https://github.com/mondaycom/tunnel/compare/tunnel-0.4.0...tunnel-0.4.1) (2022-10-06)
+
+
+### Bug Fixes
+
+* add missing dependency - dotenv ([6117658](https://github.com/mondaycom/tunnel/commit/611765892c0ac5024d3eb28955c657eb645aede7))
+
 ## [0.4.0](https://github.com/mondaycom/tunnel/compare/tunnel-0.3.0...tunnel-0.4.0) (2022-10-04)
 
 
