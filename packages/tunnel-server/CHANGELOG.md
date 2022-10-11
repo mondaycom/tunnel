@@ -2,6 +2,13 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.1.5](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.4...tunnel-server-0.1.5) (2022-10-11)
+
+
+### Bug Fixes
+
+* specify minimum node version ([0f844f5](https://github.com/mondaycom/tunnel/commit/0f844f5384e492d7cad8b22373e9097ebc072824))
+
 ### [0.1.4](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.3...tunnel-server-0.1.4) (2022-09-05)
 
 
