@@ -44,6 +44,7 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=7d'
       - '--web.external-url=http://${DOMAIN}/prometheus'
       - '--web.route-prefix=/prometheus'
     extra_hosts:
