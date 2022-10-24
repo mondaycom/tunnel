@@ -16,7 +16,7 @@ jobs:
       - uses: nrwl/nx-set-shas@v2
       - run: yarn install --frozen-lockfile
       - run: yarn nx workspace-lint
-      - run: yarn nx format:check
+      # - run: yarn nx format:check
       - run: yarn nx affected --configuration=production --target=lint --parallel=3
       # - run: yarn nx affected --configuration=production --target=test --parallel=3 --ci --code-coverage
       - run: yarn nx affected --configuration=production --target=build --parallel=3
