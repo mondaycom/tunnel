@@ -62,6 +62,8 @@ class TunnelAgent extends Agent {
   stats() {
     return {
       connectedSockets: this.connectedSockets,
+      availableSockets: this.availableSockets.length,
+      maxSockets: this.maxSockets,
     };
   }
 

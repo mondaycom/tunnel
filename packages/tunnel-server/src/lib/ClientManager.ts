@@ -26,8 +26,6 @@ class ClientManager {
   stats = {
     tunnels: 0,
   };
-  // This is totally wrong :facepalm: this needs to be per-client...
-  graceTimeout = null;
 
   url?: string;
 
@@ -44,7 +42,16 @@ class ClientManager {
 
     // can't ask for id already is use
     if (this.clients.has(id)) {
-      id = humanReadableId();
+      const newId = humanReadableId();
+      this.logger?.debug(
+        'making new client with id %s (was requesting: %s)',
+        newId,
+        id,
+        { client: newId }
+      );
+      id = newId;
+    } else {
+      this.logger?.debug('making new client with id %s', id, { client: id });
     }
 
     const maxSockets = this.opt.maxTcpSockets;
@@ -64,7 +71,7 @@ class ClientManager {
     // avoiding races with other clients requesting same id
     clients.set(id, client);
 
-    client.$close.pipe().subscribe(() => {
+    client.$close.subscribe(() => {
       this.removeClient(id);
     });
 
@@ -86,7 +93,7 @@ class ClientManager {
   }
 
   removeClient(id: string) {
-    this.logger?.debug('removing client: %s', id);
+    this.logger?.debug('removing client: %s', id, { client: id });
     const client = this.clients.get(id);
     if (!client) {
       return;
@@ -94,7 +101,7 @@ class ClientManager {
     connectedClientsHistogram.dec();
     --this.stats.tunnels;
     this.clients.delete(id);
-    client.close();
+    this.logger?.debug('removed client: %s', id, { client: id });
   }
 
   hasClient(id: string) {

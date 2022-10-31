@@ -73,7 +73,6 @@ export default function (opt: ServerOptions) {
     }
 
     const clientId = humanReadableId();
-    logger?.debug('making new client with id %s', clientId);
     const info = (await manager.newClient(clientId)) as NewClientResponse;
 
     const url = schema + '://' + info.id + '.' + hostname;
@@ -100,7 +99,6 @@ export default function (opt: ServerOptions) {
       return;
     }
 
-    logger?.debug('making new client with id %s', clientId);
     const info = await manager.newClient(clientId);
 
     const url = schema + '://' + info.id + '.' + ctx.request.host;
