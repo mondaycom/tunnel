@@ -2,6 +2,14 @@
 
 This file was generated using [@jscutlery/semver](https://github.com/jscutlery/semver).
 
+### [0.1.6](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.5...tunnel-server-0.1.6) (2022-11-16)
+
+
+### Bug Fixes
+
+* improve logging ([ffbb12c](https://github.com/mondaycom/tunnel/commit/ffbb12c0d4b28de115092e11827eb8b0b0e2674b))
+* set keep alive on sockets ([1a7803e](https://github.com/mondaycom/tunnel/commit/1a7803e1d63af94cd76de1c14ce7fd2384bc5c60))
+
 ### [0.1.5](https://github.com/mondaycom/tunnel/compare/tunnel-server-0.1.4...tunnel-server-0.1.5) (2022-10-11)
 
 
