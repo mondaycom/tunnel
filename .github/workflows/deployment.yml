@@ -13,10 +13,9 @@ jobs:
       - uses: 'google-github-actions/setup-gcloud@v0'
       - name: 'Trigger deployment script'
         run: >
-          gcloud compute ssh instance-2
+          gcloud compute ssh localtunnel-nginx-r7jf
           --zone=us-central1-a
           --ssh-flag="-v"
-          --tunnel-through-iap
           --command="rm -rf tunnel
           && git clone https://github.com/mondaycom/tunnel.git
           && cd tunnel/docker && export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
