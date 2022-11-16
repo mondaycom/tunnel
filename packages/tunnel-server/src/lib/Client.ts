@@ -36,13 +36,13 @@ class Client {
       this.close();
     }, 1000).unref();
 
-    this.agent.$online.subscribe(() => {
-      this.logger?.debug('client online %s', this.id);
+    this.agent.$online.subscribe((socketInfo) => {
+      this.logger?.info(socketInfo, 'client online %s', this.id);
       clearTimeout(this.graceTimeout);
     });
 
-    this.agent.$offline.subscribe(() => {
-      this.logger?.debug('client offline %s', this.id);
+    this.agent.$offline.subscribe((socketInfo) => {
+      this.logger?.info(socketInfo, 'client offline %s', this.id);
 
       // if there was a previous timeout set, we don't want to double trigger
       clearTimeout(this.graceTimeout);
