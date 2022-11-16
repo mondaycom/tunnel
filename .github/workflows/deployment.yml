@@ -20,6 +20,6 @@ jobs:
           --command="rm -rf tunnel
           && git clone https://github.com/mondaycom/tunnel.git
           && cd tunnel/docker && export COMPOSE_FILE=docker-compose.yml:docker-compose.prod.yml
-          && docker compose pull
-          && docker compose --env-file=.env.prod up -d"
+          && sudo docker compose pull
+          && sudo docker compose --env-file=.env.prod up -d"
           -q
