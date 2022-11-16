@@ -13,7 +13,7 @@ jobs:
       - uses: 'google-github-actions/setup-gcloud@v0'
       - name: 'Trigger deployment script'
         run: >
-          gcloud compute ssh localtunnel-nginx-r7jf
+          gcloud compute ssh instance-2
           --zone=us-central1-a
           --ssh-flag="-v"
           --command="rm -rf tunnel
