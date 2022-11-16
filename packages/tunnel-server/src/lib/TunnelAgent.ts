@@ -121,6 +121,8 @@ class TunnelAgent extends Agent {
 
   // new socket connection from client for tunneling requests to client
   private _onConnection = (socket: net.Socket): void => {
+    socket.setKeepAlive(true, 10000);
+
     const clientInfo: ClientInfo = {
       ip: socket.remoteAddress,
     };
