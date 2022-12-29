@@ -14,6 +14,7 @@ jobs:
       - name: 'Trigger deployment script'
         run: >
           gcloud compute ssh localtunnel-nginx-r7jf
+          --tunnel-through-iap
           --zone=us-central1-a
           --ssh-flag="-v"
           --command="rm -rf tunnel
