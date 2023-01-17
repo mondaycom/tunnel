@@ -1,4 +1,4 @@
-FROM node:18.7.0-alpine
+FROM node:18.9.0-alpine
 WORKDIR /app
 COPY ./dist/packages/tunnel .
 ENV TUNNEL_PORT=3000
